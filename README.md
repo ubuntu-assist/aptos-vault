@@ -1,97 +1,109 @@
-# Aptos Vault Optimization Challenge
+# Vault Smart Contract
 
-## 🚀 Smart Contract Efficiency Project
+A secure and flexible token management system built on the Aptos blockchain that enables controlled deposits, allocations, claims, and withdrawals with robust access controls.
 
-This project represents my work on optimizing the Aptos Vault smart contract by implementing a more direct and efficient parameter approach. I'm focusing on reducing computational overhead while maintaining security.
+## Overview
 
-## The Challenge
+The Vault smart contract provides a comprehensive system for managing token distributions on the Aptos blockchain. It utilizes resource accounts, signer capabilities, and events to create a secure environment for token management.
 
-### What I'm Starting With
+## Features
 
-The original contract relies on deriving vault addresses indirectly:
+- **Token Deposits**: Admin-controlled deposits into the vault
+- **Token Allocations**: Reserve tokens for specific addresses
+- **Token Claims**: Allow users to claim their allocated tokens
+- **Token Withdrawals**: Admin can withdraw unallocated tokens
+- **Balance Tracking**: Monitor total and allocated token amounts
+- **Event Logging**: Comprehensive event emission for off-chain monitoring
+
+## Architecture
+
+### Core Components
+
+- **Vault**: Main struct containing the vault's state
+- **VaultSignerCapability**: Manages signing capability for the vault's resource account
+- **Event Structures**: Track deposits, withdrawals, allocations, and claims
+
+### Functions
+
+#### Administrative Functions
+
+- **init_module**: Sets up the vault and resource account
+- **deposit_tokens**: Add tokens to the vault (admin only)
+- **allocate_tokens**: Reserve tokens for specific addresses (admin only)
+- **withdraw_tokens**: Remove unallocated tokens from the vault (admin only)
+
+#### User Functions
+
+- **claim_tokens**: Allow users to claim their allocated tokens
+
+#### View Functions
+
+- **get_balance**: Check the total balance of the vault
+- **get_total_allocated**: View the total amount of allocated tokens
+- **get_allocation**: Check allocation for a specific address
+
+## Key Concepts
+
+### Resource Account
+
+The contract uses an Aptos resource account as a "smart contract account" that can hold assets and execute transactions programmatically. The admin can sign transfers on behalf of the vault using the vault signer.
+
+### Signer Capability
+
+The contract implements signer capability to delegate transaction signing authority in a controlled, programmable way.
+
+### Event System
+
+Events are emitted for all significant actions:
+- Token deposits
+- Token allocations
+- Token claims
+- Token withdrawals
+
+## Security Features
+
+- **Access Control**: Function-level permissions restrict sensitive operations to admin
+- **Balance Verification**: Ensures the contract never transfers more tokens than available
+- **Allocation Tracking**: Careful accounting of allocated vs. unallocated tokens
+
+## Usage Examples
+
+### Depositing Tokens (Admin Only)
 
 ```move
-public fun get_vault_address(admin_address: address): address acquires VaultSignerCapability {
-    let vault_signer_cap = &borrow_global<VaultSignerCapability>(admin_address).cap;
-    account::get_signer_capability_address(vault_signer_cap)
-}
-
 public entry fun deposit_tokens(admin: &signer, amount: u64) acquires Vault, VaultSignerCapability {
-    let admin_address = signer::address_of(admin);
-    let vault_address = get_vault_address(admin_address);
-    // Function implementation...
+    // Implementation details
 }
 ```
 
-### My Optimization Approach
-
-I'm redesigning the contract to use vault addresses directly as parameters, eliminating unnecessary derivation operations:
+### Allocating Tokens (Admin Only)
 
 ```move
-public entry fun deposit_tokens(admin: &signer, vault_address: address, amount: u64) acquires Vault {
-    let vault = borrow_global_mut<Vault>(vault_address);
-    assert!(vault.admin == signer::address_of(admin), E_NOT_ADMIN);
-
-    coin::transfer<AptosCoin>(admin, vault.vault_address, amount);
-    vault.total_balance = vault.total_balance + amount;
-    event::emit_event(&mut vault.tokens_deposited_events, TokensDepositedEvent { amount });
+public entry fun allocate_tokens(admin: &signer, recipient: address, amount: u64) acquires Vault {
+    // Implementation details
 }
 ```
 
-## My Implementation Plan
-
-### Phase 1: Code Refactoring
-
-1. ✓ Remove the redundant `get_vault_address` function
-2. ✓ Update all function signatures with direct `vault_address` parameters
-3. ✓ Modify internal logic to work with the new parameter structure
-4. ✓ Update admin verification to use the stored admin address in the Vault struct
-
-### Phase 2: Contract Deployment
-
-- Set up my development environment with Remix IDE
-- Configure Move.toml with necessary dependencies
-- Deploy using my Welldone wallet
-- Record my contract's deployment address for submission
-
-### Phase 3: Comprehensive Testing
-
-- [ ] Deploy and initialize vault
-- [ ] Test token deposits with my account
-- [ ] Allocate tokens to test addresses
-- [ ] Verify admin-only restrictions
-- [ ] Test token claiming functionality
-- [ ] Verify withdrawal security
-
-## Personal Extension: Admin Transfer Feature
-
-For the bonus challenge, I'm implementing a secure ownership transfer function:
+### Claiming Tokens
 
 ```move
-public entry fun transfer_vault_ownership(admin: &signer, vault_address: address, new_admin: address) acquires Vault {
-    let admin_address = signer::address_of(admin);
-    let vault = borrow_global_mut<Vault>(vault_address);
-
-    assert!(vault.admin == admin_address, E_NOT_ADMIN);
-
-    vault.admin = new_admin;
-
-    event::emit_event(&mut vault.transfer_events, VaultTransferEvent {
-        vault_address,
-        from: admin_address,
-        to: new_admin
-    });
+public entry fun claim_tokens(recipient: &signer) acquires Vault, VaultSignerCapability {
+    // Implementation details
 }
 ```
 
-## Project Submission
+### Withdrawing Tokens (Admin Only)
 
-My submission will include:
+```move
+public entry fun withdraw_tokens(admin: &signer, amount: u64) acquires Vault, VaultSignerCapability {
+    // Implementation details
+}
+```
 
-- My optimized contract implementation
-- My testnet contract address: 0x...
-- My testing results and optimization analysis
+## Development
 
----
-
-_This project demonstrates my understanding of Move language optimization techniques and secure smart contract design principles._
+This contract provides insight into key Aptos concepts:
+- Resource accounts
+- Signer capabilities
+- Event emission
+- Access control
