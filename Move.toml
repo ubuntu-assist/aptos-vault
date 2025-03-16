@@ -1,0 +1,16 @@
+[package]
+name = "the_vault"
+version = "1.0.0"
+authors = []
+
+[addresses]
+the_vault = "0x594da783914f5af27e157c90aad755c62f909f82a7f11e91da94e4d500380b09"
+
+[dev-addresses]
+
+[dependencies.AptosFramework]
+git = "https://github.com/aptos-labs/aptos-framework.git"
+rev = "mainnet"
+subdir = "aptos-framework"
+
+[dev-dependencies]
